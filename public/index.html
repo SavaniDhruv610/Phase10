@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phase 10 Party</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Local Pass-and-Play Card Game</p>
+        <h1>Phase 10 Party</h1>
+        <p class="hero-copy">
+          Play the full 10-phase game for 2 to 6 players using the rules you provided:
+          draw, lay down your phase, hit on laid phases, discard, score the round, and advance until someone clears Phase 10.
+        </p>
+      </div>
+      <div class="hero-card">
+        <div class="stat">
+          <span class="stat-value">2-6</span>
+          <span class="stat-label">Players</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">108</span>
+          <span class="stat-label">Cards</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">10</span>
+          <span class="stat-label">Phases</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="room-banner" id="room-banner" style="background: rgba(214, 84, 42, 0.1); padding: 12px; border-radius: 12px; margin-bottom: 16px; border: 1px dashed var(--primary); text-align: center; display: none;">
+        <span style="font-weight: bold; color: var(--primary);">Room Code: </span><span id="room-code-display" style="font-family: 'Space Grotesk', monospace; font-size: 1.2rem; font-weight: bold;"></span>
+      </div>
+      <section id="setup-screen" class="panel">
+        <div class="panel-header">
+          <h2>Start a Game</h2>
+          <p>Choose player count, set names, then begin the first round. Everyone starts with 10 cards.</p>
+        </div>
+        <div class="setup-grid">
+          <label class="field">
+            <span>Your Name</span>
+            <input type="text" id="local-player-name" placeholder="Enter your name" value="Dhruv" maxlength="18">
+          </label>
+          <div class="action-row" style="margin-top: 10px;">
+            <button id="create-room-btn" class="primary-btn">Create Room</button>
+          </div>
+          <div style="margin: 10px 0; font-weight: bold; text-align: center; opacity: 0.5;">OR</div>
+          <label class="field">
+            <input type="text" id="room-code-input" placeholder="Room Code" style="text-transform: uppercase;">
+          </label>
+          <div class="action-row" style="margin-top: 10px;">
+            <button id="join-room-btn" class="secondary-btn">Join Room</button>
+          </div>
+          
+          <div id="lobby-container" class="hidden" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line);">
+             <h3>Lobby</h3>
+             <ul id="lobby-players" style="margin-bottom: 20px;"></ul>
+             <button id="start-game-btn" class="primary-btn" style="width:100%;">Start Game</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="game-screen" class="game-layout hidden">
+        <div class="green-table">
+          <div class="table-content">
+            <div class="phase-required-box">
+              <h3>PHASE REQUIRED</h3>
+              <ol id="phase-list" class="phase-list"></ol>
+            </div>
+            
+            <div class="table-center" id="laid-phases"></div>
+            
+            <div class="table-piles">
+              <div class="pile">
+                <div id="draw-pile-card" class="card-back large-card"></div>
+              </div>
+              <div class="pile" style="margin-top: 20px;">
+                <div id="discard-pile-card" class="large-card placeholder-card">Empty</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="hand-panel">
+            <div id="player-hand" class="player-hand"></div>
+          </div>
+        </div>
+
+        <aside class="right-drawer">
+          <div class="drawer-header">
+            <h2>PHASE 10</h2>
+          </div>
+          
+          <div class="drawer-scoreboard">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <h3 style="margin:0; opacity: 0.8; text-transform: uppercase;">Scoreboard</h3>
+              <span id="round-label" style="font-weight: bold; color: var(--primary);"></span>
+            </div>
+            <div id="players-summary" class="players-summary"></div>
+          </div>
+          
+          <div class="drawer-actions">
+            <button id="lay-phase-btn" class="drawer-btn btn-yellow">PLAY PHASE (Auto)</button>
+            
+            <div style="display: flex; gap: 8px;">
+               <button id="manual-lay-btn" class="drawer-btn btn-dark" style="flex: 1;">MANUAL LAY</button>
+               <button id="discard-btn" class="drawer-btn btn-red" style="flex: 1;">DISCARD</button>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+               <button id="hit-card-btn" class="drawer-btn btn-dark" style="flex: 1;">AUTO HIT</button>
+               <button id="manual-hit-btn" class="drawer-btn btn-dark" style="flex: 1;">MANUAL HIT</button>
+            </div>
+            
+            <label class="field" style="margin-top: 0px;">
+              <span style="font-size: 0.75rem; opacity:0.8;">Hit target</span>
+              <select id="hit-target"></select>
+            </label>
+            <label class="field" style="margin-top: 8px;">
+              <span style="font-size: 0.75rem; opacity:0.8;">Skip target</span>
+              <select id="skip-target">
+                <option value="">Choose player to skip</option>
+              </select>
+            </label>
+
+            <div style="margin-top: 5px; font-size: 0.75rem; opacity: 0.8; line-height: 1.2;">
+              <p id="turn-status" style="margin: 0;"></p>
+              <p id="phase-target" style="margin: 2px 0 0 0;"></p>
+              <p id="selection-status" style="margin: 2px 0 0 0;"></p>
+            </div>
+            <div id="message-bar" class="message-bar" style="margin-top: 5px; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 8px; font-size: 0.8rem; color: var(--primary); font-weight: bold;"></div>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <div id="turn-overlay" class="turn-overlay hidden">
+    <div class="overlay-card">
+      <p class="eyebrow">Pass the Device</p>
+      <h2 id="overlay-player-name"></h2>
+      <p id="overlay-phase"></p>
+      <p id="overlay-summary"></p>
+      <button id="reveal-turn-btn" class="primary-btn">Reveal Hand</button>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 id="modal-title"></h2>
+      <p id="modal-body"></p>
+      <button id="modal-btn" class="primary-btn">Continue</button>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
