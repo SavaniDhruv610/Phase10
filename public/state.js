@@ -59,8 +59,14 @@ export function setLocalRoomId(id) {
   localRoomId = id;
 }
 
-export let socket = null;
+export let peer = null;
+export let peerConnections = {};
+export let isHost = false;
 
-export function setSocket(s) {
-  socket = s;
+export function setPeer(p) {
+  peer = p;
+}
+
+export function setIsHost(val) {
+  isHost = val;
 }
