@@ -1,16 +1,10 @@
 {
   "name": "phase10",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Phase 10 WebRTC Multiplayer",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "npx serve ."
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "express": "^5.2.1"
-  }
+  "author": "Savani Dhruv",
+  "license": "ISC"
 }
