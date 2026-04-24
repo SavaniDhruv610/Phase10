@@ -7,11 +7,13 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
+const path = require("path");
+
 // Room data structure
 // rooms[roomId] = { state: { ... } }
 const rooms = {};
 
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 function generateRoomId() {
   return crypto.randomBytes(3).toString("hex").toUpperCase();
@@ -75,6 +77,10 @@ wss.on("connection", (ws) => {
 });
 
 const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  server.listen(PORT, () => {
+    console.log(`Server listening on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

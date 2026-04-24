@@ -26,6 +26,8 @@ export function startRound() {
     player.laidDown = null;
     player.completedPhaseThisRound = false;
     player.skips = 0;
+    player.pendingSkip = null;
+    player.wasSkippedLastTurn = false;
   });
 
   for (let i = 0; i < HAND_SIZE; i += 1) {
@@ -335,20 +337,30 @@ export function handleDiscard() {
       setMessage("Selected player not found.");
       return;
     }
-    if (skippedPlayerObj.skips > 0) {
+    if (skippedPlayerObj.id === player.id) {
+      setMessage("You cannot skip yourself.");
+      return;
+    }
+    if (skippedPlayerObj.pendingSkip || skippedPlayerObj.skips > 0) {
       setMessage(`${skippedPlayerObj.name} is already skipped! You cannot stack skips.`);
       return;
     }
+    if (skippedPlayerObj.wasSkippedLastTurn) {
+      setMessage(`${skippedPlayerObj.name} was skipped last turn! A player cannot be skipped two turns in a row.`);
+      return;
+    }
     skippedPlayerName = skippedPlayerObj.name;
-    skippedPlayerObj.skips = 1;
+    skippedPlayerObj.pendingSkip = card;
   }
 
   player.hand = player.hand.filter((entry) => entry.id !== card.id);
-  state.discardPile.push(card);
+  if (card.type !== "skip") {
+    state.discardPile.push(card);
+  }
   state.selectedCardIds = [];
 
   if (card.type === "skip") {
-    setMessage(`${player.name} discarded a Skip. ${skippedPlayerName} will miss their upcoming turn.`);
+    setMessage(`${player.name} played a Skip on ${skippedPlayerName}.`);
     if (els.skipTarget) els.skipTarget.value = "";
   } else {
     setMessage(`${player.name} discarded ${describeCard(card)}.`);
@@ -373,11 +385,23 @@ export function advanceTurn() {
 
 export function maybeHandleSkipAtTurnStart() {
   let current = getCurrentPlayer();
-  while (current && current.skips > 0) {
-    current.skips -= 1;
+  while (current && (current.pendingSkip || current.skips > 0)) {
+    if (current.pendingSkip) {
+      const skipCard = current.pendingSkip;
+      current.pendingSkip = null;
+      state.discardPile.push(skipCard);
+    }
+    if (current.skips > 0) {
+      current.skips -= 1;
+    }
+    current.wasSkippedLastTurn = true;
     setMessage(`${current.name} was skipped!`);
     state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.players.length;
     current = getCurrentPlayer();
+  }
+
+  if (current) {
+    current.wasSkippedLastTurn = false;
   }
 }
 

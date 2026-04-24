@@ -29,7 +29,7 @@ function renderSummary() {
     }
     const currentPhaseNumber = Math.min(player.phaseIndex + 1, PHASES.length);
     card.innerHTML = `
-      <strong>${player.name}</strong> ${player.skips > 0 ? `<span style="color:var(--red, red); font-size: 0.8rem;">(Skipped)</span>` : ""}
+      <strong>${player.name}</strong> ${(player.pendingSkip || player.skips > 0) ? `<span style="color:var(--red, red); font-size: 0.8rem;">(Skipped)</span>` : ""}
       <div style="color: var(--primary); font-weight: bold; margin-top: 4px;">Phase: ${player.phaseIndex >= PHASES.length ? "Completed" : currentPhaseNumber}</div>
       <div>Score: ${player.score}</div>
       <div>Cards: ${player.hand.length}</div>
